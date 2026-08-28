@@ -884,6 +884,12 @@ export default defineConfig({
     assetsInlineLimit: 2048,
     chunkSizeWarningLimit: 1200,
     minify: "esbuild",
+    // Vercel's build log shows the reporter stalling while computing gzip
+    // sizes for thousands of chunks (including a 23 MB WASM). The sizes are
+    // only used for the CLI table; disabling them avoids the timeout without
+    // affecting the emitted bundle.
+    reportCompressedSize: false,
+
     // Vite's default modulepreload preloads the transitive graph of every async
     // chunk reachable from the entry, which made the landing page eagerly fetch
     // ~1MB of markdown/syntax/icons/chat code. Fully disabling it fixed that but
