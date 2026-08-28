@@ -790,19 +790,23 @@ export default defineConfig({
         ],
       },
     }),
-    // Pre-compress build assets with Brotli and Gzip so hosting (Cloudflare /
-    // Vercel / static edge) can serve the smallest possible payload without
-    // recompressing per request. Skips small and already-compressed assets.
-    compression({
-      algorithms: [
-        defineAlgorithm("brotliCompress", {
-          params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
-        }),
-        defineAlgorithm("gzip", { level: 9 }),
-      ],
-      exclude: [/\.(br|gz|png|jpe?g|webp|avif|woff2?|mp4|webm)$/i],
-      threshold: 1024,
-    }),
+    // Vercel compresses responses at the edge. Generating thousands of
+    // maximum-quality Brotli/Gzip files during its build can exceed its time
+    // limit, so retain pre-compression only for other static hosts.
+    ...(process.env.VERCEL
+      ? []
+      : [
+          compression({
+            algorithms: [
+              defineAlgorithm("brotliCompress", {
+                params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
+              }),
+              defineAlgorithm("gzip", { level: 9 }),
+            ],
+            exclude: [/\.(br|gz|png|jpe?g|webp|avif|woff2?|mp4|webm)$/i],
+            threshold: 1024,
+          }),
+        ]),
     // Enable with `ANALYZE=1 bun run build` — writes dist/stats.html.
     ...(process.env.ANALYZE
       ? [
