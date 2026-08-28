@@ -649,9 +649,21 @@ export default defineConfig({
     buildIdPlugin(),
     devServerBridgePlugin(),
 
-    react(),
-    // React Compiler temporarily disabled on Vercel to keep builds under the
-    // 3-minute Hobby timeout. The app still uses React 19's automatic runtime.
+    // React Compiler is a Babel pass over every component. On Vercel Hobby it
+    // pushes the build close to the 3-minute timeout, so keep it everywhere
+    // except the production build step.
+    react({
+      babel: process.env.VERCEL
+        ? undefined
+        : {
+            plugins: [
+              // React Compiler — auto-memoizes every component and hook across
+              // the site. Eliminates unnecessary re-renders without hand-written
+              // React.memo / useMemo / useCallback everywhere. Runs at build time.
+              ["babel-plugin-react-compiler", { target: "19" }],
+            ],
+          },
+    }),
     integrationAppTokenDevPlugin(),
     anythingApiDevPlugin(),
     manusAdminDevPlugin(),
