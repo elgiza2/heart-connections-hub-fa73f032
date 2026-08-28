@@ -699,7 +699,6 @@ export default defineConfig({
         globPatterns: [
           "index.html",
           "offline.html",
-          "manifest.webmanifest",
           "site.webmanifest",
           "assets/index-*.{js,css}",
           "assets/react-vendor-*.js",
