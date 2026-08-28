@@ -649,16 +649,9 @@ export default defineConfig({
     buildIdPlugin(),
     devServerBridgePlugin(),
 
-    react({
-      babel: {
-        plugins: [
-          // React Compiler — auto-memoizes every component and hook across
-          // the site. Eliminates unnecessary re-renders without hand-written
-          // React.memo / useMemo / useCallback everywhere. Runs at build time.
-          ["babel-plugin-react-compiler", { target: "19" }],
-        ],
-      },
-    }),
+    react(),
+    // React Compiler temporarily disabled on Vercel to keep builds under the
+    // 3-minute Hobby timeout. The app still uses React 19's automatic runtime.
     integrationAppTokenDevPlugin(),
     anythingApiDevPlugin(),
     manusAdminDevPlugin(),
