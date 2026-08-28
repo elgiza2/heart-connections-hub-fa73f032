@@ -649,15 +649,20 @@ export default defineConfig({
     buildIdPlugin(),
     devServerBridgePlugin(),
 
+    // React Compiler is a Babel pass over every component. On Vercel Hobby it
+    // pushes the build close to the 3-minute timeout, so keep it everywhere
+    // except the production build step.
     react({
-      babel: {
-        plugins: [
-          // React Compiler — auto-memoizes every component and hook across
-          // the site. Eliminates unnecessary re-renders without hand-written
-          // React.memo / useMemo / useCallback everywhere. Runs at build time.
-          ["babel-plugin-react-compiler", { target: "19" }],
-        ],
-      },
+      babel: process.env.VERCEL
+        ? undefined
+        : {
+            plugins: [
+              // React Compiler — auto-memoizes every component and hook across
+              // the site. Eliminates unnecessary re-renders without hand-written
+              // React.memo / useMemo / useCallback everywhere. Runs at build time.
+              ["babel-plugin-react-compiler", { target: "19" }],
+            ],
+          },
     }),
     integrationAppTokenDevPlugin(),
     anythingApiDevPlugin(),
@@ -694,7 +699,6 @@ export default defineConfig({
         globPatterns: [
           "index.html",
           "offline.html",
-          "manifest.webmanifest",
           "site.webmanifest",
           "assets/index-*.{js,css}",
           "assets/react-vendor-*.js",
